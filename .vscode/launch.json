@@ -1,0 +1,45 @@
+{
+	// Use IntelliSense to learn about possible attributes.
+	// Hover to view descriptions of existing attributes.
+	// For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+	"version": "0.2.0",
+	"configurations": [
+		{
+			"type": "lldb",
+			"request": "launch",
+			"name": "Debug executable 'tgm_acc_2019_expert_level3'",
+			"cargo": {
+				"args": [
+					"build",
+					"--bin=tgm_acc_2019_expert_level3",
+					"--package=tgm_acc_2019_expert_level3"
+				],
+				"filter": {
+					"name": "tgm_acc_2019_expert_level3",
+					"kind": "bin"
+				}
+			},
+			"args": [],
+			"cwd": "${workspaceFolder}"
+		},
+		{
+			"type": "lldb",
+			"request": "launch",
+			"name": "Debug unit tests in executable 'tgm_acc_2019_expert_level3'",
+			"cargo": {
+				"args": [
+					"test",
+					"--no-run",
+					"--bin=tgm_acc_2019_expert_level3",
+					"--package=tgm_acc_2019_expert_level3"
+				],
+				"filter": {
+					"name": "tgm_acc_2019_expert_level3",
+					"kind": "bin"
+				}
+			},
+			"args": [],
+			"cwd": "${workspaceFolder}"
+		}
+	]
+}
