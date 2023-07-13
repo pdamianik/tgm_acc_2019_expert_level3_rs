@@ -1,8 +1,4 @@
-use std::sync::{
-    atomic::{AtomicUsize, Ordering},
-    Arc,
-};
-use std::thread::{available_parallelism, spawn};
+use std::{sync::Arc, thread::{available_parallelism, spawn}};
 use num::{BigUint, Zero};
 
 use crate::generator::*;
@@ -10,24 +6,16 @@ use crate::generator::*;
 pub fn m(n: usize) -> BigUint {
     let s = Arc::new(S::new().take(n).map(|val| val as u32).collect::<Vec<_>>());
 
-    let last_j = Arc::new(AtomicUsize::new(0));
-
     let available_cores: usize = available_parallelism().unwrap().into();
     let mut handels = Vec::with_capacity(available_cores);
 
-    for _ in 0..available_parallelism().unwrap().into() {
+    for i in 0..available_cores {
         let s = s.clone();
-        let last_j = last_j.clone();
 
         handels.push(spawn(move || {
             let mut sum = BigUint::zero();
 
-            loop {
-                let j = last_j.fetch_add(1, Ordering::Relaxed);
-                if j >= n {
-                    break;
-                }
-
+            for j in (i..n).step_by(available_cores) {
                 let mut min = s[j] as usize;
                 sum += min;
 

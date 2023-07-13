@@ -55,7 +55,7 @@ The first simple optimization can be seen in the [original repository](https://g
 
 time: `O(n^2)` (with caching), `O(n^3)` (without caching), space: `O(n)` (with caching), `O(1)` (without caching)
 
-> Note: the rust implementation uses caching (see: [src/rayon.rs:7](src/rayon.rs#L7) and [src/parallel.rs:11](src/parallel.rs#L11))
+> Note: the rust implementation uses caching (see: [src/rayon.rs:7](src/rayon.rs#L7) and [src/parallel.rs:7](src/parallel.rs#L7))
 
 A different way to describe the problem is to sum the minima of all continuous ranges of `S[]`. A way to visualize the naive algorithm for `M(4)` would be:
 
