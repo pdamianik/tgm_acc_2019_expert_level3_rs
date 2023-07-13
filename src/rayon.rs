@@ -7,14 +7,14 @@ pub fn m(n: usize) -> BigUint {
     let s = S::new().take(n).map(|val| val as u32).collect::<Vec<_>>();
 
     (0..n).into_par_iter().map(|j| {
-        (0..=j).rev().scan(s[j], |min, i| {
+        (0..=j).rev().scan(s[j], |min, i| -> Option<BigUint> {
             let elem = s[i];
 
             if elem < *min {
                 *min = elem;
             }
 
-            Some(BigUint::new(vec![*min]))
+            Some((*min).into())
         }).sum::<BigUint>()
     }).sum()
 }

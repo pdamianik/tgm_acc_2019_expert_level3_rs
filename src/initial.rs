@@ -1,4 +1,4 @@
-use num::BigUint;
+use num::{BigUint, Zero};
 
 fn s(o: usize) -> usize {
     let mut result = 290797;
@@ -21,13 +21,11 @@ fn a(i: usize, j: usize) -> BigUint {
         }
     }
 
-    let mut result = BigUint::new(vec![]);
-    result += min;
-    result
+    min.into()
 }
 
 pub fn m(n: usize) -> BigUint {
-    let mut sum = BigUint::new(vec![]);
+    let mut sum = BigUint::zero();
 
     for j in 1..=n {
         for i in 1..=j {

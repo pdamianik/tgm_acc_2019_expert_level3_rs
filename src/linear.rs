@@ -15,8 +15,7 @@ pub struct LinearCalc {
 
 impl LinearCalc {
     pub fn new(first_elem: usize, n: Option<usize>) -> Self {
-        let mut sum = BigUint::new(vec![]);
-        sum += first_elem;
+        let sum: BigUint = first_elem.into();
 
         Self {
             last_sum: sum.clone(),
@@ -51,8 +50,7 @@ impl LinearCalc {
             self.last_sum += elem;
             self.local_buffer.push(elem);
         } else {
-            let mut addition = BigUint::new(vec![]);
-            addition += elem;
+            let mut addition: BigUint = elem.into();
             addition *= self.index;
             self.sum += addition.clone();
             addition += elem;

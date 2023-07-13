@@ -116,10 +116,10 @@ This algorithm iterates through `S[]` mostly linearly resulting in the `O(~n)` t
 Because this algorithm accesses `S[]` linearly there is no need for a cache for all `S[]` values anymore. There is a local cache for some of the last `S[]` values until the last maximum which makes up the `O(~1)` space complexity as this cache doesn't grow with `n` but the specific properties of `S[]` specifically that it has a global minimum and that it is periodic.
 Another difference to the previous algorithm is that every `j`-row now depends on some of the last `j`-rows (at least the previous one but in the worst case on all the ones until the last global minimum; this is the local cache).
 
-In this algorithm we always explicitly add the current element to the sum (in [linear.rs:19](src/linear.rs#L19)) as every element will be the minimum at least once, when it is the only element being checked.
+In this algorithm we always explicitly add the current element to the sum (in [src/linear.rs:32](src/linear.rs#L32)) as every element will be the minimum at least once, when it is the only element being checked.
 
 The first optimization is the optimization reusisng previous minima from the previous algorithm applied linearly (The minimum between this element and the last element).
-If the last element is smaller than the current element we can simply add the sum from the last element to the total sum. This is done in [src/linear.rs:50-52](src/linear.rs#L50-L52).
+If the last element is smaller than the current element we can simply add the sum from the last element to the total sum. This is done in [src/linear.rs:49-51](src/linear.rs#L49-L51).
 
 ```
 ...|i-3|i-2|i-1|i|...
@@ -148,7 +148,7 @@ The second optimization is that if the current element is smaller than the last 
 While iterating through the local cache we keep track of a cache minimum from the last element onward and subtract it with each iteration from the last sum and add the current element.
 This effectively replaces each of the last added minima in the last sum which are bigger than our current element in `S[]` with the current element.
 The cache has to reach until the last global minimum since that element is guaranteed to be smaller than our current element (if it wasn't our current element would be the global minimum, which is a seperate case handled by the last optimization).
-Lastly the updated last sum is added to the total sum and the current element is added to the last sum. This is done in [src/linear.rs:36-52](src/linear.rs#L36-L52).
+Lastly the updated last sum is added to the total sum and the current element is added to the last sum. This is done in [src/linear.rs:35-51](src/linear.rs#L35-L51).
 
 ```
 ...|g|i-3|i-2|i-1|i|...
@@ -183,7 +183,7 @@ Lastly the updated last sum is added to the total sum and the current element is
 The finial optimization keeps track of the global minimum.
 If our current element is smaller or equals the last global minimum, `S[i] * (i - 1)` can simply be added to the total sum and the local cache can be reset.
 It is important that this case should also apply when the current element equals the last global mimimum as this keeps the local cache small.
-This is done in [src/linear.rs:54-61](src/linear.rs#L54-L61).
+This is done in [src/linear.rs:53-59](src/linear.rs#L53-L59).
 
 ```
 // current iteration
@@ -246,11 +246,11 @@ a,b,d,e,f...arbitrary numbers in S[]
 ```
 
 The `cycle_local_sum` is simply `M(target's equivalent first cycle position)`.
-This is taken from cached values in [src/cycle.rs:62](src/cycle.rs#L62) and calculated based on the hardcoded state of `M(min_index)` in [src/hardcoded.rs:23-50](src/hardcoded.rs#L23-L50).
+This is taken from cached values in [src/cycle.rs:62](src/cycle.rs#L62) and calculated based on the hardcoded state of `M(min_index)` in [src/hardcoded.rs:23-46](src/hardcoded.rs#L23-L46).
 
 With the value of `M(first_cycle_index)` (calculated with [src/linear.rs](src/linear.rs)) we can fill in the cycles in between with the `first_cycle_sum = M(second_min_index) - M(first_min_index)` multitplied with the `cycle_index`.
 `first_cycle_sum` is the sum of all the `j`-rows in the first cycle and multitplied with the `cycle_index`. This results in the sum of all the cycles in between the target position in the first cycle and the target position in the target cycle minus all the global minima in between (those grow with each cycle).
-This is done in [src/cycle.rs:64-73](src/cycle.rs#L64-L73) and [src/hardcoded.rs:52-58](src/hardcoded.rs#L52-L58).
+This is done in [src/cycle.rs:64-73](src/cycle.rs#L64-L73) and [src/hardcoded.rs:48-53](src/hardcoded.rs#L48-L53).
 
 ```
 |----6----|
@@ -275,8 +275,8 @@ a,b,d,e,f...arbitrary numbers in S[]
 ```
 
 The last step is to fill in these missing global minima. Since the total sum of cycle global minima is an arithmetic progressing with each additional cycle we can use [this forumla](https://en.wikipedia.org/wiki/Arithmetic_progression#Sum) to calculate the fill with the cycle index as `n`.
-This is done in [src/cycle.rs:77-90](src/cycle.rs#L77-L90) and [src/hardcoded.rs:61-71](src/hardcoded.rs#L61-L71).
-This also adds global minima for a full target cycle which have to be subtracted in the end to result in the right result. See [src/cycle.rs:92-97](src/cycle.rs#L92-L97) and [src/hardcoded.rs:73-78](src/hardcoded.rs#L73-L78).
+This is done in [src/cycle.rs:77-88](src/cycle.rs#L77-L88) and [src/hardcoded.rs:56-64](src/hardcoded.rs#L56-L64).
+This also adds global minima for a full target cycle which have to be subtracted in the end to result in the right result. See [src/cycle.rs:90-94](src/cycle.rs#L90-L94) and [src/hardcoded.rs:66-70](src/hardcoded.rs#L66-L70).
 
 ```
 |----6----|

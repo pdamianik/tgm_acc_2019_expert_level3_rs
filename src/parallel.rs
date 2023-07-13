@@ -3,7 +3,7 @@ use std::sync::{
     Arc,
 };
 use std::thread::{available_parallelism, spawn};
-use num::BigUint;
+use num::{BigUint, Zero};
 
 use crate::generator::*;
 
@@ -20,7 +20,7 @@ pub fn m(n: usize) -> BigUint {
         let last_j = last_j.clone();
 
         handels.push(spawn(move || {
-            let mut sum = BigUint::new(vec![]);
+            let mut sum = BigUint::zero();
 
             loop {
                 let j = last_j.fetch_add(1, Ordering::Relaxed);
@@ -43,7 +43,7 @@ pub fn m(n: usize) -> BigUint {
         }));
     }
 
-    let mut sum = BigUint::new(vec![]);
+    let mut sum = BigUint::zero();
     for handel in handels {
         sum += handel.join().unwrap();
     }

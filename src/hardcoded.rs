@@ -25,16 +25,12 @@ pub fn m(n: usize) -> BigUint {
             value: 3,
         };
 
-        let mut sum = BigUint::new(vec![]);
-        sum += 1723152794732772usize;
-        let mut last_sum = BigUint::new(vec![]);
-        last_sum += 7901991usize;
         let mut linear_calc = LinearCalc {
-            sum,
+            sum: 1723152794732772usize.into(),
             index: 2633996,
             min: 3,
             last_elem: 3,
-            last_sum,
+            last_sum: 7901991usize.into(),
             local_buffer: Vec::with_capacity(8942944),
         };
 
@@ -50,28 +46,24 @@ pub fn m(n: usize) -> BigUint {
     };
 
     cycle_local_sum += {
-        let mut first_cycle_sum = BigUint::new(vec![]);
-        first_cycle_sum += FIRST_CYCLE_SUM;
+        let mut first_cycle_sum: BigUint = FIRST_CYCLE_SUM.into();
         first_cycle_sum *= cycle_index;
 
         first_cycle_sum
     };
 
     cycle_local_sum += {
-        let mut min_fill_step = BigUint::new(vec![]);
-        min_fill_step += MIN_FILL_STEP;
+        let mut min_fill_step: BigUint = MIN_FILL_STEP.into();
 
-        let mut cycle_min_fill = BigUint::new(vec![]);
+        let mut cycle_min_fill: BigUint = (cycle_index - 1).into();
 
-        cycle_min_fill += cycle_index - 1;
         cycle_min_fill *= min_fill_step.clone();
         min_fill_step *= 2usize;
         cycle_min_fill += min_fill_step;
         cycle_min_fill *= cycle_index;
         cycle_min_fill /= 2usize;
 
-        let mut min_fill_overflow = BigUint::new(vec![]);
-        min_fill_overflow += MIN;
+        let mut min_fill_overflow: BigUint = MIN.into();
         min_fill_overflow *= cycle_index * CYCLE_WIDTH;
         min_fill_overflow *= CYCLE_WIDTH - 1 - cycle_local_index;
 

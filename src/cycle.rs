@@ -74,23 +74,20 @@ pub fn m(n: usize) -> BigUint {
 
     // Add missing global minima for cycles in between
     cycle_local_sum += {
-        let mut min_fill_step = BigUint::new(vec![]);
+        let mut min_fill_step: BigUint = min.into();
 
-        min_fill_step += min;
         min_fill_step *= cycle_width;
         min_fill_step *= cycle_width;
 
-        let mut cycle_min_fill = BigUint::new(vec![]);
+        let mut cycle_min_fill: BigUint = (cycle_index - 1).into();
 
-        cycle_min_fill += cycle_index - 1;
         cycle_min_fill *= min_fill_step.clone();
         min_fill_step *= 2usize;
         cycle_min_fill += min_fill_step;
         cycle_min_fill *= cycle_index;
         cycle_min_fill /= 2usize;
 
-        let mut min_fill_overflow = BigUint::new(vec![]);
-        min_fill_overflow += min;
+        let mut min_fill_overflow: BigUint = min.into();
         min_fill_overflow *= cycle_index * cycle_width;
         min_fill_overflow *= cycle_width - 1 - cycle_local_index;
 
