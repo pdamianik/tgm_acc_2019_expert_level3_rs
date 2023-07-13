@@ -4,7 +4,11 @@ A blazingly fast reimplementation of [pdamianik/TGM-ACC-2019 level3](https://git
 
 ## The problem
 
-The problem is defined as:
+| time | space |
+|------|-------|
+| `O(n^4)` | `O(1)` |
+
+The given problem is defined as:
 
 ```
 S[0]=290797 S[n+1]=S[n]^2 mod 50515093 Let A(i,j) min S[i],S[i+1],…,S[j] for i≤j. Let M(N) = ∑A(i,j) for 1≤i≤j≤N
@@ -39,13 +43,15 @@ or in rust: See [src/initial.rs](src/initial.rs)
 
 In particular we are interested in the value `M(2_000_000_000) = ?` and know that `M(10) = 432256955` and `M(10_000) = 3264567774119`.
 
-`M(10)` can be calculated quickly with just the naive implementation above (e.g. the rust implementation takes between 50ms and 100ms to complete), but since this algorithm has a time complexity of `O(n^4)` it requires a different approach for anything beyond `n = 10^1`.
+`M(10)` can be calculated fast enough with the naive implementation above (e.g. the rust implementation takes between 50ms and 100ms to complete), but since this algorithm has a time complexity of `O(n^4)` it requires a different approach for anything beyond `n = 10^1`.
 
 ## Optimizations
 
 ### Caching
 
-time: `O(n^3)`, space: `O(n)`
+| time | space |
+|------|-------|
+| `O(n^3)` | `O(n)` |
 
 The first simple optimization can be seen in the [original repository](https://github.com/pdamianik/TGM-ACC-2019/blob/master/levels/level3/main.py#L5) where a simple cache for the `S(n)` function is added. This optimization reduces the time complexity to `O(n^3)` which still is far from usable for our target of `n = 2_000_000_000`.
 
@@ -53,11 +59,14 @@ The first simple optimization can be seen in the [original repository](https://g
 
 ### Reuse previous minima and parallelize
 
-time: `O(n^2)` (with caching), `O(n^3)` (without caching), space: `O(n)` (with caching), `O(1)` (without caching)
+|               | time | space |
+|---------------|------|-------|
+| without cache | `O(n^3)` | `O(1)` | 
+|  with cache   | `O(n^2)` | `O(n)` |
 
-> Note: the rust implementation uses caching (see: [src/rayon.rs:7](src/rayon.rs#L7) and [src/parallel.rs:7](src/parallel.rs#L7))
+> Note: the rust implementation exclusively uses caching (see: [src/rayon.rs:7](src/rayon.rs#L7) and [src/parallel.rs:7](src/parallel.rs#L7))
 
-A different way to describe the problem is to sum the minima of all continuous ranges of `S[]`. A way to visualize the naive algorithm for `M(4)` would be:
+A different way to describe the problem is the sum of the minima of all continuous ranges of `S[]`. A visualization of the naive algorithm evaluating `M(4)` is:
 
 ```
 S ->  |1|2|3|4|
@@ -77,12 +86,11 @@ i = 4        _  = 4
 j = 4 --------- = min(1, 2, 3, 4) + min(2, 3, 4) + min(3, 4) + 4
 ```
 
-where each `i`-row is the minimum of all the underlined elements and each `j`-row is the sum of all `i`-rows up to the previous `j`-row (exclusive).
-The `j`-rows therefore mirror the behavior of `A(i, j)`.
+where each `i`-row is the minimum of all underlined elements and each `j`-row is the sum of all `i`-rows up to the previous `j`-row (exclusive).
 
 The result would be the sum of all `j`-rows: `min(1) + min(1, 2) + min(2) + min(1, 2, 3) + min(2, 3) + min(3) + min(1, 2, 3, 4) + min(2, 3, 4) + min(3, 4) + min(4)`.
 
-By reversing the order of the `i`-rows between the `j`-row we can reuse the minimum of the the previous iteration of `i` by utilizing the fact that `min(a, b, c) = min(min(a, b), c)`:
+By reversing the order of `i`-rows between the `j`-rows we can reuse the minimum of the the previous iteration of `i` by utilizing the fact that `min(a, b, c) = min(min(a, b), c)`:
 
 ```
 S ->  |1|2|3|4|
@@ -93,12 +101,12 @@ i = 1  _ _      = min(1, 2)
 j = 2 --------- = 2 + min(1, 2)
 i = 3      _    = 3
 i = 2    _ _    = min(2, 3)
-i = 1  _ _ _    = min(1, min(2, 3))
+i = 1  _ _ _    = min(1, min(2, 3)) // reuse min(2, 3) from the previous iteration
 j = 3 --------- = min(3) + min(2, 3) + min(1, min(2, 3))
 i = 4        _  = 4
 i = 3      _ _  = min(3, 4)
-i = 2    _ _ _  = min(2, min(3, 4))
-i = 1  _ _ _ _  = min(1, min(2, min(3, 4)))
+i = 2    _ _ _  = min(2, min(3, 4)) // reuse min(3, 4) from the previous iteration
+i = 1  _ _ _ _  = min(1, min(2, min(3, 4))) // reuse min(2, min(3, 4)) from the previous iteration
 j = 4 --------- = min(4) + min(3, 4) + min(2, min(3, 4)) + min(1, min(2, min(3, min(4)))
 ```
 
@@ -110,16 +118,20 @@ These optimizations are implemented in [src/rayon.rs](src/rayon.rs) (implemented
 
 ### Make it linear
 
-time: `O(~n)` space: `O(~1)`
+| time | space |
+|------|-------|
+| `O(~n)` | `O(~1)` |
 
 This algorithm iterates through `S[]` mostly linearly resulting in the `O(~n)` time complexity.
-Because this algorithm accesses `S[]` linearly there is no need for a cache for all `S[]` values anymore. There is a local cache for some of the last `S[]` values until the last maximum which makes up the `O(~1)` space complexity as this cache doesn't grow with `n` but the specific properties of `S[]` specifically that it has a global minimum and that it is periodic.
-Another difference to the previous algorithm is that every `j`-row now depends on some of the last `j`-rows (at least the previous one but in the worst case on all the ones until the last global minimum; this is the local cache).
+Because this algorithm accesses `S[]` linearly there is no need for a cache for all `S[]` values anymore.
+There is a local cache for some of the last `S[]` values that reaches until the last maximum.
+This cache makes up the `O(~1)` space complexity as it doesn't grow with `n` but the specific properties of `S[]`, specifically that it has a global minimum and that it is periodic.
+Another difference to the previous algorithm is that every `j`-row now depends on some of the last `j`-rows (at least the previous one but in the worst case on all the ones until the last global minimum; this is the local cache). This makes parallelization useless.
 
 In this algorithm we always explicitly add the current element to the sum (in [src/linear.rs:32](src/linear.rs#L32)) as every element will be the minimum at least once, when it is the only element being checked.
 
-The first optimization is the optimization reusisng previous minima from the previous algorithm applied linearly (The minimum between this element and the last element).
-If the last element is smaller than the current element we can simply add the sum from the last element to the total sum. This is done in [src/linear.rs:49-51](src/linear.rs#L49-L51).
+The simplest case for each iteration is that the last element is smaller than the current element. In that case we can simply reuse the last elements sum.
+This is done in [src/linear.rs:49-51](src/linear.rs#L49-L51).
 
 ```
 ...|i-3|i-2|i-1|i|...
@@ -137,18 +149,18 @@ If the last element is smaller than the current element we can simply add the su
    --------------- = i-1 + min(i-2, i-1) + min(i-3, i-2, i-1) + min(..., i-3, i-2, i-1) = last_sum
 // current iteration
                 _  = i // added anyway
-             _  _  = i-1 // Note that from here on we can just use the previous rows since they will always contian an element smaller than the current one (starting with the last element)
+             _  _  = i-1 // from here on we can just use the previous rows since they will always contian an element smaller than the current one (starting with the last element)
          _   _  _  = min(i-2, i-1)
      _   _   _  _  = min(i-3, i-2, i-1)
  _   _   _   _  _  = min(..., i-3, i-2, i-1)
    --------------- = i /* added anyway */ + last_sum = new last_sum
 ```
 
-The second optimization is that if the current element is smaller than the last element, we have to backtrack trough a local cache of the last elements to find a smaller element.
+In case the current element is smaller than the last element instead, we have to backtrack trough a local cache of the last elements to find a smaller element.
 While iterating through the local cache we keep track of a cache minimum from the last element onward and subtract it with each iteration from the last sum and add the current element.
 This effectively replaces each of the last added minima in the last sum which are bigger than our current element in `S[]` with the current element.
-The cache has to reach until the last global minimum since that element is guaranteed to be smaller than our current element (if it wasn't our current element would be the global minimum, which is a seperate case handled by the last optimization).
-Lastly the updated last sum is added to the total sum and the current element is added to the last sum. This is done in [src/linear.rs:35-51](src/linear.rs#L35-L51).
+The cache has to reach until the last global minimum since that element is guaranteed to be smaller than our current element (if it wasn't our current element would be the global minimum, which is a seperate case handled seperately).
+Lastly the last_sum can be reused again, just like in the last case. This is done in [src/linear.rs:35-51](src/linear.rs#L35-L51).
 
 ```
 ...|g|i-3|i-2|i-1|i|...
@@ -180,7 +192,7 @@ Lastly the updated last sum is added to the total sum and the current element is
    ----------------- = i /* added anyway */ + last_sum - (i-1) + i - min(i-2, i-1) + i /* backtracking */ = new last_sum
 ```
 
-The finial optimization keeps track of the global minimum.
+Finally we have to keep track of the global minimum.
 If our current element is smaller or equals the last global minimum, `S[i] * (i - 1)` can simply be added to the total sum and the local cache can be reset.
 It is important that this case should also apply when the current element equals the last global mimimum as this keeps the local cache small.
 This is done in [src/linear.rs:53-59](src/linear.rs#L53-L59).
@@ -197,10 +209,12 @@ This is done in [src/linear.rs:53-59](src/linear.rs#L53-L59).
 
 ### Abuse the cycle
 
-time: `O(~1)`, space: `O(~1)`
+| time | space |
+|------|-------|
+| `O(~1)` | `O(~1)` |
 
 The last two algorithms use the fact that the elements of `S[]` repeat and have a repeating global mimimum of 3.
-The difference between [src/cycle.rs](src/cycle.rs) and [src/hardcoded.rs](src/hardcoded.rs) is that the former calculates the span of a cycle on the fly and uses that to extrapolate any `M(n)`, whereas the latter has the cycle attributes hardcoded.
+The difference between [src/cycle.rs](src/cycle.rs) and [src/hardcoded.rs](src/hardcoded.rs) is that the former calculates the span of a cycle on the fly and uses that to extrapolate any `M(n)`, whereas the latter has the cycles attributes hardcoded.
 Both also use [src/linear.rs](src/linear.rs) in the background to calculate values inside and before the first iteration of the cycle.
 
 The following is a simplyfied view of the cycles of S:
@@ -226,8 +240,8 @@ The first step in [src/cycle.rs](src/cycle.rs) is to find the first and second o
 The results of this step are hardcoded in [src/hardcoded.rs](src/hardcoded.rs), which is the only difference between these two algorithms.
 This is done in [src/cycle.rs:11-37](src/cycle.rs#L11-L37) and hardcoded in [src/hardcoded.rs:6-9](src/hardcoded.rs#L6-L9).
 
-When the first cycle is found we can calculate the target's equivalent position in the first cycle with `first_min_index + ((n - first_min_index) % (second_min_index - first_min_index) /* the cycle width */)`.
-Additionally we can get the target cycle index (from the first cycle onwards, in the example it would be 1) with the forumla `(n - first_min_index) / (second_min_index - first_min_index) /* the cycle width */`.
+When the first cycle is found we can calculate the targets equivalent position in the first cycle with `first_min_index + ((n - first_min_index) % (second_min_index - first_min_index) /* the cycle width */)`.
+Additionally we can get the target cycle index (from the first cycle onwards, in the example it would be 2) with the forumla `(n - first_min_index) / (second_min_index - first_min_index) /* the cycle width */`.
 This is done in [src/cycle.rs:58-61](src/cycle.rs#L58-L61) and [src/hardcoded.rs:19-21](src/hardcoded.rs#L19-L21).
 
 ```
@@ -245,15 +259,16 @@ p...The prefix
 a,b,d,e,f...arbitrary numbers in S[]
 ```
 
-The `cycle_local_sum` is simply `M(target's equivalent first cycle position)`.
+The `cycle_local_sum` is simply `M(targets equivalent first cycle position)`.
 This is taken from cached values in [src/cycle.rs:62](src/cycle.rs#L62) and calculated based on the hardcoded state of `M(min_index)` in [src/hardcoded.rs:23-46](src/hardcoded.rs#L23-L46).
 
-With the value of `M(first_cycle_index)` (calculated with [src/linear.rs](src/linear.rs)) we can fill in the cycles in between with the `first_cycle_sum = M(second_min_index) - M(first_min_index)` multitplied with the `cycle_index`.
-`first_cycle_sum` is the sum of all the `j`-rows in the first cycle and multitplied with the `cycle_index`. This results in the sum of all the cycles in between the target position in the first cycle and the target position in the target cycle minus all the global minima in between (those grow with each cycle).
+With the value of `M(first_cycle_index)` (calculated with [src/linear.rs](src/linear.rs)) we can fill in the cycles in between with the `first_cycle_sum = M(second_min_index - 1) - M(first_min_index - 1)` multitplied with the `cycle_index`.
+`first_cycle_sum` is the sum of all the `j`-rows in the first cycle and multitplied with the `cycle_index`. This results in the sum of all the cycles in between the first and the target cycle minus all the global minima in between (those grow with each cycle past the first cycle).
 This is done in [src/cycle.rs:64-73](src/cycle.rs#L64-L73) and [src/hardcoded.rs:48-53](src/hardcoded.rs#L48-L53).
 
 ```
 |----6----|
+    |---0---|>>>>>>>|
     |-------5-------|    
 |-6-|-------5-------|--6--|
 |0|0|3|3|3|3|3|3|3|3|3|3|3| // The global minima included in 5 and 6
