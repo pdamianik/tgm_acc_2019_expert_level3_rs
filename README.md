@@ -452,11 +452,12 @@ All in all the sums of the cycles can be visualized as follows:
 
 Done with `cargo bench` wich uses [criterion.rs](https://github.com/bheisler/criterion.rs) in the background. The following are the center timing results (probably medians), except for [src/linear.rs](src/linear.rs) `M(2*10^9)` which is just a single manual run.
 
-|   call    |[src/initial.rs](src/initial.rs)|[src/rayon.rs](src/rayon.rs)|[src/parallel.rs](src/parallel.rs)|[src/linear.rs](src/linear.rs)|[src/cycle.rs](src/cycle.rs)|[src/hardcoded.rs](src/hardcoded.rs)|
-|-----------|--------------------------------|----------------------------|----------------------------------|------------------------------|----------------------------|------------------------------------|
-| time complexity | `O(n^4)` | `O(n^2)` | `O(n^2)` | `O(n)` | `O(~1)` | `O(~1)` |
-| space complexity | `O(1)` | `O(n)` | `O(n)` | `O(~1)` | `O(~1)` | `O(~1)` |
-|  M(10^1)  |            2.6747 µs           |          19.127 µs         |             213.03 µs            |           746.22 ns          |          713.63 ns         |             781.58 ns              |
-|  M(10^4)  |               -                |          473.54 ms         |             34.019 ms            |           971.95 µs          |          1.2133 ms         |             946.28 µs              |
-| M(2*10^9) |               -                |             -              |                -                 |     ~4.5 min (single run)    |          1.5744 s          |             527.53 ms              |
+| call             | [src/initial.rs](src/initial.rs) | [src/rayon.rs](src/rayon.rs) | [src/parallel.rs](src/parallel.rs) | [src/linear.rs](src/linear.rs) | [src/cycle.rs](src/cycle.rs) | [src/hardcoded.rs](src/hardcoded.rs) |
+|------------------|----------------------------------|------------------------------|------------------------------------|--------------------------------|------------------------------|--------------------------------------|
+| time complexity  | `O(n^4)`                         | `O(n^2)`                     | `O(n^2)`                           | `O(n)`                         | `O(~1)`                      | `O(~1)`                              |
+| space complexity | `O(1)`                           | `O(n)`                       | `O(n)`                             | `O(~1)`                        | `O(~1)`                      | `O(~1)`                              |
+| M(10^1)          | 2.6766 µs                        | 18.657 µs                    | 170.78 µs                          | 5.1612 µs                      | 691.81 ns                    | 5.5037 µs                            |
+| M(10^4)          | -                                | 491.42 ms                    | 54.406 ms                          | 895.48 µs                      | 1.2153 ms                    | 841.83 µs                            |
+| M(2*10^9)        | -                                | -                            | -                                  | ~4.5 min (single run)          | 1.5172 s                     | 484.06 ms                            |
+| M(u128::MAX)     | -                                | -                            | -                                  | -                              | 1.5164 s                     | 642.63 ms                            |
 
