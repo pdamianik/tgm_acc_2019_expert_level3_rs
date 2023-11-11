@@ -1,10 +1,15 @@
-const N: usize = 10;
+const N: u128 = 10;
 
 use clap::{Parser, Subcommand, ValueEnum};
-use tgm_acc_2019_expert_level3::{initial, rayon, parallel, linear, cycle, hardcoded};
+use tgm_acc_2019_expert_level3::{cycle, hardcoded, initial, linear, parallel, rayon};
 
 #[derive(Parser)]
-#[command(author, version, about, long_about = "A collection of solutions for the problem S[0]=290797 S[n+1]=S[n]^2 mod 50515093 Let A(i,j) min S[i],S[i+1],…,S[j] for i≤j. Let M(N) = ∑A(i,j) for 1≤i≤j≤N. M(n)=?")]
+#[command(
+    author,
+    version,
+    about,
+    long_about = "A collection of solutions for the problem S[0]=290797 S[n+1]=S[n]^2 mod 50515093 Let A(i,j) min S[i],S[i+1],…,S[j] for i≤j. Let M(N) = ∑A(i,j) for 1≤i≤j≤N. M(n)=?"
+)]
 struct Cli {
     #[command(subcommand)]
     command: Commands,
@@ -19,11 +24,11 @@ enum Commands {
         algorithm: Algorithms,
         /// The argument n for the function m
         #[arg(default_value_t = N)]
-        n: usize,
+        n: u128,
     },
 }
 
-#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, ValueEnum)]
+#[derive(Clone, Copy, PartialEq, Eq, ValueEnum)]
 enum Algorithms {
     /// The algorithm as the exercise puts it (WARNING doesn't scale well)
     /// time: O(n^4), mem: O(1))
@@ -63,15 +68,15 @@ fn main() {
     match command {
         Commands::Solve { algorithm, n } => {
             let result = match algorithm {
-                Algorithms::Initial | Algorithms::I => initial::m(n),
-                Algorithms::Rayon | Algorithms::R => rayon::m(n),
-                Algorithms::Parallel | Algorithms::P => parallel::m(n),
-                Algorithms::Linear | Algorithms::L => linear::m(n),
+                Algorithms::Initial | Algorithms::I => initial::m(n as usize),
+                Algorithms::Rayon | Algorithms::R => rayon::m(n as usize),
+                Algorithms::Parallel | Algorithms::P => parallel::m(n as usize),
+                Algorithms::Linear | Algorithms::L => linear::m(n as usize),
                 Algorithms::Cycle | Algorithms::C => cycle::m(n),
                 Algorithms::Hardcoded | Algorithms::H => hardcoded::m(n),
             };
 
             println!("M({}) = {}", n, result);
-        },
+        }
     };
 }

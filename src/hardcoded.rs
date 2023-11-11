@@ -3,16 +3,16 @@ use num::BigUint;
 use crate::generator::*;
 use crate::{linear, linear::LinearCalc};
 
-const MIN: usize = 3;
-const MIN_INDEX: usize = 2633996;
-const MIN_CYCLE: usize = 8942944;
-const CYCLE_WIDTH: usize = 6308948;
-const FIRST_CYCLE_SUM: usize = 4638033462857199;
-const MIN_FILL_STEP: usize = 119408474600112;
+const MIN: u128 = 3;
+const MIN_INDEX: u128 = 2633996;
+const MIN_CYCLE: u128 = 8942944;
+const CYCLE_WIDTH: u128 = 6308948;
+const FIRST_CYCLE_SUM: u128 = 4638033462857199;
+const MIN_FILL_STEP: u128 = 119408474600112;
 
-pub fn m(n: usize) -> BigUint {
+pub fn m(n: u128) -> BigUint {
     if n < MIN_INDEX {
-        return linear::m(n);
+        return linear::m(n as usize);
     }
 
     let n = n - 1;

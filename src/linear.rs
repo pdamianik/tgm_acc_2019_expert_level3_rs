@@ -34,7 +34,7 @@ impl LinearCalc {
         if elem > self.min {
             if elem < self.last_elem {
                 let mut local_min = usize::MAX;
-                
+
                 for &elem2 in self.local_buffer.iter().rev() {
                     if elem2 < elem {
                         break;
@@ -71,7 +71,7 @@ pub fn m(n: usize) -> BigUint {
 
     for _i in 1..n {
         if _i & u16::MAX as usize == 0 {
-            print!("\r{}/{} {}%\x1B[0K", _i, n, (_i as f32)/(n as f32)*(100.0));
+            print!("\r{}/{} {}%\x1B[0K", _i, n, (_i as f32) / (n as f32) * (100.0));
         }
 
         linear_calc.next(s.next().unwrap());

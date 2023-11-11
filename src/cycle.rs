@@ -3,7 +3,7 @@ use num::BigUint;
 use crate::generator::*;
 use crate::linear::LinearCalc;
 
-pub fn m(n: usize) -> BigUint {
+pub fn m(n: u128) -> BigUint {
     let mut s = S::new();
     let n = n - 1;
 
@@ -11,10 +11,10 @@ pub fn m(n: usize) -> BigUint {
     let (min, min_index, min_cycle, linear_sums) = {
         let mut min = s.next().unwrap();
         let mut min_index = 0;
-        let min_cycle: usize;
+        let min_cycle;
         let mut i = 0;
 
-        let mut linear_calc = LinearCalc::new(min, Some(n + 1));
+        let mut linear_calc = LinearCalc::new(min, Some((n + 1) as usize));
         let mut linear_sums = vec![linear_calc.sum.clone()];
 
         loop {
@@ -59,12 +59,12 @@ pub fn m(n: usize) -> BigUint {
     let first_min_distance = n - min_index;
     let cycle_index = first_min_distance / cycle_width;
     let cycle_local_index = first_min_distance % cycle_width;
-    let mut cycle_local_sum = linear_sums[min_index + cycle_local_index].clone();
+    let mut cycle_local_sum = linear_sums[(min_index + cycle_local_index) as usize].clone();
 
     // Add sums consistent for every cycle + global minima for the prefix
     cycle_local_sum += {
-        let mut first_cycle_sum = linear_sums[min_cycle - 1].clone();
-        let prefix_sum = linear_sums[min_index - 1].clone();
+        let mut first_cycle_sum = linear_sums[(min_cycle - 1) as usize].clone();
+        let prefix_sum = linear_sums[(min_index - 1) as usize].clone();
 
         first_cycle_sum -= prefix_sum;
         first_cycle_sum *= cycle_index;

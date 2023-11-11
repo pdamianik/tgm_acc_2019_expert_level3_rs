@@ -7,15 +7,34 @@
 		{
 			"type": "lldb",
 			"request": "launch",
-			"name": "Debug executable 'tgm_acc_2019_expert_level3'",
+			"name": "Debug unit tests in library 'tgm_acc_2019_expert_level3'",
 			"cargo": {
 				"args": [
-					"build",
-					"--bin=tgm_acc_2019_expert_level3",
+					"test",
+					"--no-run",
+					"--lib",
 					"--package=tgm_acc_2019_expert_level3"
 				],
 				"filter": {
 					"name": "tgm_acc_2019_expert_level3",
+					"kind": "lib"
+				}
+			},
+			"args": [],
+			"cwd": "${workspaceFolder}"
+		},
+		{
+			"type": "lldb",
+			"request": "launch",
+			"name": "Debug executable 'level3'",
+			"cargo": {
+				"args": [
+					"build",
+					"--bin=level3",
+					"--package=tgm_acc_2019_expert_level3"
+				],
+				"filter": {
+					"name": "level3",
 					"kind": "bin"
 				}
 			},
@@ -25,17 +44,131 @@
 		{
 			"type": "lldb",
 			"request": "launch",
-			"name": "Debug unit tests in executable 'tgm_acc_2019_expert_level3'",
+			"name": "Debug unit tests in executable 'level3'",
 			"cargo": {
 				"args": [
 					"test",
 					"--no-run",
-					"--bin=tgm_acc_2019_expert_level3",
+					"--bin=level3",
 					"--package=tgm_acc_2019_expert_level3"
 				],
 				"filter": {
-					"name": "tgm_acc_2019_expert_level3",
+					"name": "level3",
 					"kind": "bin"
+				}
+			},
+			"args": [],
+			"cwd": "${workspaceFolder}"
+		},
+		{
+			"type": "lldb",
+			"request": "launch",
+			"name": "Debug benchmark 'initial'",
+			"cargo": {
+				"args": [
+					"test",
+					"--no-run",
+					"--bench=initial",
+					"--package=tgm_acc_2019_expert_level3"
+				],
+				"filter": {
+					"name": "initial",
+					"kind": "bench"
+				}
+			},
+			"args": [],
+			"cwd": "${workspaceFolder}"
+		},
+		{
+			"type": "lldb",
+			"request": "launch",
+			"name": "Debug benchmark 'rayon'",
+			"cargo": {
+				"args": [
+					"test",
+					"--no-run",
+					"--bench=rayon",
+					"--package=tgm_acc_2019_expert_level3"
+				],
+				"filter": {
+					"name": "rayon",
+					"kind": "bench"
+				}
+			},
+			"args": [],
+			"cwd": "${workspaceFolder}"
+		},
+		{
+			"type": "lldb",
+			"request": "launch",
+			"name": "Debug benchmark 'parallel'",
+			"cargo": {
+				"args": [
+					"test",
+					"--no-run",
+					"--bench=parallel",
+					"--package=tgm_acc_2019_expert_level3"
+				],
+				"filter": {
+					"name": "parallel",
+					"kind": "bench"
+				}
+			},
+			"args": [],
+			"cwd": "${workspaceFolder}"
+		},
+		{
+			"type": "lldb",
+			"request": "launch",
+			"name": "Debug benchmark 'linear'",
+			"cargo": {
+				"args": [
+					"test",
+					"--no-run",
+					"--bench=linear",
+					"--package=tgm_acc_2019_expert_level3"
+				],
+				"filter": {
+					"name": "linear",
+					"kind": "bench"
+				}
+			},
+			"args": [],
+			"cwd": "${workspaceFolder}"
+		},
+		{
+			"type": "lldb",
+			"request": "launch",
+			"name": "Debug benchmark 'cycle'",
+			"cargo": {
+				"args": [
+					"test",
+					"--no-run",
+					"--bench=cycle",
+					"--package=tgm_acc_2019_expert_level3"
+				],
+				"filter": {
+					"name": "cycle",
+					"kind": "bench"
+				}
+			},
+			"args": [],
+			"cwd": "${workspaceFolder}"
+		},
+		{
+			"type": "lldb",
+			"request": "launch",
+			"name": "Debug benchmark 'hardcoded'",
+			"cargo": {
+				"args": [
+					"test",
+					"--no-run",
+					"--bench=hardcoded",
+					"--package=tgm_acc_2019_expert_level3"
+				],
+				"filter": {
+					"name": "hardcoded",
+					"kind": "bench"
 				}
 			},
 			"args": [],
