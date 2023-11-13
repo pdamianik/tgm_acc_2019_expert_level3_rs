@@ -41,7 +41,7 @@ def M(n: Int) -> Int:
 
 or in rust: See [src/initial.rs](src/initial.rs)
 
-In particular we are interested in the value `M(2_000_000_000) = ?` and know that `M(10) = 432256955` and `M(10_000) = 3264567774119`.
+In particular, we are interested in the value `M(2_000_000_000) = ?` and know that `M(10) = 432256955` and `M(10_000) = 3264567774119`.
 
 `M(10)` can be calculated fast enough with the naive implementation above (e.g. the rust implementation takes between 50ms and 100ms to complete), but since this algorithm has a time complexity of `O(n^4)` it requires a different approach for anything beyond `n = 10^1`.
 
@@ -55,7 +55,7 @@ In particular we are interested in the value `M(2_000_000_000) = ?` and know tha
 
 The first simple optimization can be seen in the [original repository](https://github.com/pdamianik/TGM-ACC-2019/blob/master/levels/level3/main.py#L5) where a simple cache for the `S(n)` function is added. This optimization reduces the time complexity to `O(n^3)` which still is far from usable for our target of `n = 2_000_000_000`.
 
-> Because a cache for `S(n)` is used in later optimizations (e.g. [src/rayon.rs:7](src/rayon.rs#L7)) there is no deticated caching version in the rust implementation
+> Because a cache for `S(n)` is used in later optimizations (e.g. [src/rayon.rs:7](src/rayon.rs#L7)) there is no dedicated caching version in the rust implementation
 
 ### Reuse previous minima and parallelize
 
@@ -90,7 +90,7 @@ where each `i`-row is the minimum of all underlined elements and each `j`-row is
 
 The result would be the sum of all `j`-rows: `min(1) + min(1, 2) + min(2) + min(1, 2, 3) + min(2, 3) + min(3) + min(1, 2, 3, 4) + min(2, 3, 4) + min(3, 4) + min(4)`.
 
-By reversing the order of `i`-rows between the `j`-rows we can reuse the minimum of the the previous iteration of `i` by utilizing the fact that `min(a, b, c) = min(min(a, b), c)`:
+By reversing the order of `i`-rows between the `j`-rows we can reuse the minimum of the previous iteration of `i` by utilizing the fact that `min(a, b, c) = min(min(a, b), c)`:
 
 ```
 S ->  |1|2|3|4|
@@ -112,7 +112,7 @@ j = 4 --------- = min(4) + min(3, 4) + min(2, min(3, 4)) + min(1, min(2, min(3, 
 
 Each `i`-row can now reuse the result of the previous `i`-row, which results in a time-complexity of `O(n^2)` (assuming that a lookup into `S[]` has a time complexity of `O(1)`, which can be accomplished with a cache)
 
-Additionally every `j`-row can be calculated independently of the other `j`-rows and therefore we can use multiple threads to handle each `j`-row.
+Additionally, every `j`-row can be calculated independently of the other `j`-rows, and therefore we can use multiple threads to handle each `j`-row.
 
 These optimizations are implemented in [src/rayon.rs](src/rayon.rs) (implemented with [rayon](https://crates.io/crates/rayon)) and [src/parallel.rs](src/parallel.rs) (implemented with rust native threads)
 
@@ -156,10 +156,10 @@ This is done in [src/linear.rs:49-51](src/linear.rs#L49-L51).
    --------------- = i /* added anyway */ + last_sum = new last_sum
 ```
 
-In case the current element is smaller than the last element instead, we have to backtrack trough a local cache of the last elements to find a smaller element.
+In case the current element is smaller than the last element instead, we have to backtrack through a local cache of the last elements to find a smaller element.
 While iterating through the local cache we keep track of a cache minimum from the last element onward and subtract it with each iteration from the last sum and add the current element.
 This effectively replaces each of the last added minima in the last sum which are bigger than our current element in `S[]` with the current element.
-The cache has to reach until the last global minimum since that element is guaranteed to be smaller than our current element (if it wasn't our current element would be the global minimum, which is a seperate case handled seperately).
+The cache has to reach until the last global minimum since that element is guaranteed to be smaller than our current element (if it wasn't our current element would be the global minimum, which is a separate case handled separately).
 Lastly the last_sum can be reused again, just like in the last case. This is done in [src/linear.rs:35-51](src/linear.rs#L35-L51).
 
 ```
@@ -192,9 +192,9 @@ Lastly the last_sum can be reused again, just like in the last case. This is don
    ----------------- = i /* added anyway */ + last_sum - (i-1) + i - min(i-2, i-1) + i /* backtracking */ = new last_sum
 ```
 
-Finally we have to keep track of the global minimum.
+Finally, we have to keep track of the global minimum.
 If our current element is smaller or equals the last global minimum, `S[i] * (i - 1)` can simply be added to the total sum and the local cache can be reset.
-It is important that this case should also apply when the current element equals the last global mimimum as this keeps the local cache small.
+It is important that this case should also apply when the current element equals the last global minimum as this keeps the local cache small.
 This is done in [src/linear.rs:53-59](src/linear.rs#L53-L59).
 
 ```
@@ -213,11 +213,11 @@ This is done in [src/linear.rs:53-59](src/linear.rs#L53-L59).
 |------|-------|
 | `O(~1)` | `O(~1)` |
 
-The last two algorithms use the fact that the elements of `S[]` repeat and have a repeating global mimimum of 3.
+The last two algorithms use the fact that the elements of `S[]` repeat and have a repeating global minimum of 3.
 The difference between [src/cycle.rs](src/cycle.rs) and [src/hardcoded.rs](src/hardcoded.rs) is that the former calculates the span of a cycle on the fly and uses that to extrapolate any `M(n)`, whereas the latter has the cycles attributes hardcoded.
 Both also use [src/linear.rs](src/linear.rs) in the background to calculate values inside and before the first iteration of the cycle.
 
-The following is a simplyfied view of the cycles of S:
+The following is a simplified view of the cycles of S:
 
 ```
          6               5
@@ -236,12 +236,12 @@ a,b,d,e,f...arbitrary numbers in S[]
 
 Any target before or in the first cycle will be returned early, since we have to calculate those areas anyway.
 
-The first step in [src/cycle.rs](src/cycle.rs) is to find the first and second occurance of a global minimum in `S[]`.
+The first step in [src/cycle.rs](src/cycle.rs) is to find the first and second occurrence of a global minimum in `S[]`.
 The results of this step are hardcoded in [src/hardcoded.rs](src/hardcoded.rs), which is the only difference between these two algorithms.
 This is done in [src/cycle.rs:11-37](src/cycle.rs#L11-L37) and hardcoded in [src/hardcoded.rs:6-9](src/hardcoded.rs#L6-L9).
 
 When the first cycle is found we can calculate the targets equivalent position in the first cycle with `first_min_index + ((n - first_min_index) % (second_min_index - first_min_index) /* the cycle width */)`.
-Additionally we can get the target cycle index (from the first cycle onwards, in the example it would be 2) with the forumla `(n - first_min_index) / (second_min_index - first_min_index) /* the cycle width */`.
+Additionally, we can get the target cycle index (from the first cycle onwards, in the example it would be 2) with the formula `(n - first_min_index) / (second_min_index - first_min_index) /* the cycle width */`.
 This is done in [src/cycle.rs:58-61](src/cycle.rs#L58-L61) and [src/hardcoded.rs:19-21](src/hardcoded.rs#L19-L21).
 
 ```
@@ -262,8 +262,8 @@ a,b,d,e,f...arbitrary numbers in S[]
 The `cycle_local_sum` is simply `M(targets equivalent first cycle position)`.
 This is taken from cached values in [src/cycle.rs:62](src/cycle.rs#L62) and calculated based on the hardcoded state of `M(min_index)` in [src/hardcoded.rs:23-46](src/hardcoded.rs#L23-L46).
 
-With the value of `M(first_cycle_index)` (calculated with [src/linear.rs](src/linear.rs)) we can fill in the cycles in between with the `first_cycle_sum = M(second_min_index - 1) - M(first_min_index - 1)` multitplied with the `cycle_index`.
-`first_cycle_sum` is the sum of all the `j`-rows in the first cycle and multitplied with the `cycle_index`. This results in the sum of all the cycles in between the first and the target cycle minus all the global minima in between (those grow with each cycle past the first cycle).
+With the value of `M(first_cycle_index)` (calculated with [src/linear.rs](src/linear.rs)) we can fill in the cycles in between with the `first_cycle_sum = M(second_min_index - 1) - M(first_min_index - 1)` multiplied with the `cycle_index`.
+`first_cycle_sum` is the sum of all the `j`-rows in the first cycle and multiplied with the `cycle_index`. This results in the sum of all the cycles in between the first and the target cycle minus all the global minima in between (those grow with each cycle past the first cycle).
 This is done in [src/cycle.rs:64-73](src/cycle.rs#L64-L73) and [src/hardcoded.rs:48-53](src/hardcoded.rs#L48-L53).
 
 ```
@@ -289,7 +289,7 @@ p...The prefix
 a,b,d,e,f...arbitrary numbers in S[]
 ```
 
-The last step is to fill in these missing global minima. Since the total sum of cycle global minima is an arithmetic progressing with each additional cycle we can use [this forumla](https://en.wikipedia.org/wiki/Arithmetic_progression#Sum) to calculate the fill with the cycle index as `n`.
+The last step is to fill in these missing global minima. Since the total sum of cycle global minima is an arithmetic progressing with each additional cycle we can use [this formula](https://en.wikipedia.org/wiki/Arithmetic_progression#Sum) to calculate the fill with the cycle index as `n`.
 This is done in [src/cycle.rs:77-88](src/cycle.rs#L77-L88) and [src/hardcoded.rs:56-64](src/hardcoded.rs#L56-L64).
 This also adds global minima for a full target cycle which have to be subtracted in the end to result in the right result. See [src/cycle.rs:90-94](src/cycle.rs#L90-L94) and [src/hardcoded.rs:66-70](src/hardcoded.rs#L66-L70).
 
@@ -450,7 +450,7 @@ All in all the sums of the cycles can be visualized as follows:
 
 ## Some rough timings
 
-Done with `cargo bench` wich uses [criterion.rs](https://github.com/bheisler/criterion.rs) in the background. The following are the center timing results (probably medians), except for [src/linear.rs](src/linear.rs) `M(2*10^9)` which is just a single manual run.
+Done with `cargo bench` which uses [criterion.rs](https://github.com/bheisler/criterion.rs) in the background. The following are the center timing results (probably medians), except for [src/linear.rs](src/linear.rs) `M(2*10^9)` which is just a single manual run.
 
 | call             | [src/initial.rs](src/initial.rs) | [src/rayon.rs](src/rayon.rs) | [src/parallel.rs](src/parallel.rs) | [src/linear.rs](src/linear.rs) | [src/cycle.rs](src/cycle.rs) | [src/hardcoded.rs](src/hardcoded.rs) |
 |------------------|----------------------------------|------------------------------|------------------------------------|--------------------------------|------------------------------|--------------------------------------|
